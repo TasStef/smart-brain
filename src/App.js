@@ -9,6 +9,8 @@ import Logo from './components/Logo/Logo';
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
 import './App.css';
+import Modal from './components/Modal/Modal';
+import Profile from "./components/Profile/Profile";
 
 const initialState = {
     input: '',
@@ -16,6 +18,7 @@ const initialState = {
     listOfBoxes: [],
     route: 'signin',
     isSignedIn: false,
+    isProfileOpen: false,
     user: {
         id: '',
         name: '',
@@ -105,22 +108,38 @@ class App extends Component {
 
     onRouteChange = (route) => {
         if (route === 'signout') {
-            this.setState(initialState)
+            return this.setState(initialState)
         } else if (route === 'home') {
             this.setState({isSignedIn: true})
         }
         this.setState({route: route});
     }
 
+    toggleModal = () => {
+        this.setState(prevState => ({
+            ...prevState,
+            isProfileOpen: !prevState.isProfileOpen
+        }))
+    }
+
     render() {
-        const {isSignedIn, imageUrl, route, listOfBoxes} = this.state;
+        const {isSignedIn, imageUrl, route, listOfBoxes, isProfileOpen, user} = this.state;
         return (
             <div className="App">
                 <ParticlesBg type="circle" bg={true}/>
-                <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange}/>
+                <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} toggleModal={this.toggleModal}/>
                 {route === 'home'
                     ? <div>
                         <Logo/>
+                        {isProfileOpen &&
+                            <Modal>
+                                <Profile
+                                    isProfileOpen={isProfileOpen}
+                                    toggleModal={this.toggleModal}
+                                    user={user}
+                                    loadUser={this.loadUser}
+                                />
+                            </Modal>}
                         <Rank
                             name={this.state.user.name}
                             entries={this.state.user.entries}
